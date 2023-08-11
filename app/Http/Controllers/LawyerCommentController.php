@@ -50,7 +50,7 @@ class LawyerCommentController extends Controller
             'lawyers.img',
         )
             ->from('lawyer_comments as lc1')
-            ->where('lc1.slander_id', $request->lawyer_id)
+            ->where('lc1.slander_id', $request->slander_id)
             ->leftJoin('lawyers', 'lc1.lawyer_id', '=', 'lawyers.lawyer_id')
             ->orderBy('lawyer_comment_date', 'asc')
             ->get());
