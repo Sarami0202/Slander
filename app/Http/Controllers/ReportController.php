@@ -15,6 +15,14 @@ class ReportController extends Controller
         return $this->jsonResponse(Report::all());
     }
 
+    public function getReport($id)
+    {
+        return $this->jsonResponse(Report::where('slander_id', $id)->orderBy('report_date', 'desc')->get());
+    }
+    public function getCount($id)
+    {
+        return $this->jsonResponse(Report::where('slander_id', $id)->count());
+    }
     /**
      * Store a newly created resource in storage.
      */

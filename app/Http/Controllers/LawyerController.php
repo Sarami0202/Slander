@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lawyer;
+use App\Models\LawyerComment;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Storage;
 class LawyerController extends Controller
 {
     /**
@@ -19,7 +21,7 @@ class LawyerController extends Controller
     public function getLawyer(Request $request)
     {
         return $this->jsonResponse(Lawyer::select('*')
-            ->where('id', $request->id)
+            ->where('lawyer_id', $request->id)
             ->get());
     }
     public function auth(Request $request)
@@ -50,27 +52,44 @@ class LawyerController extends Controller
         ]);
     }
 
+    public function update(Request $request)
+    {
+        $path = null;
+        if ($request['img'] != null) {
+            $main_file = $request->file('img');
+            $path = isset($main_file) ? $main_file->store('icon', 'public') : null;
+            $lawyer = Lawyer::where('lawyer_id', $request->lawyer_id)->first();
+            Storage::disk('public')->delete($lawyer->img);
+        }
+        Lawyer::where('lawyer_id', $request->lawyer_id)->update([
+            'img' => $path,
+            'name' => $request->name,
+            'mail' => $request->mail,
+            'pass' => $request->pass,
+            'url' => $request->url,
+        ]);
+    }
     /**
      * Display the specified resource.
      */
-    public function show(Lawyer $lawyer)
+    public function licenseUpdate(Request $request)
     {
-        //
+        Lawyer::where('lawyer_id', $request->lawyer_id)->update([
+            'license' => $request->license
+        ]);
     }
-
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Lawyer $lawyer)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Lawyer $lawyer)
+    public function destroy(Request $request)
     {
-        //
+        Lawyer::where('lawyer_id', $request->lawyer_id)
+            ->delete();
+        LawyerComment::where('lawyer_id', $request->lawyer_id)
+            ->delete();
     }
 }

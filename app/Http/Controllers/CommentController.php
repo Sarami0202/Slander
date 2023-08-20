@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\CommentEvaluation;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,7 @@ class CommentController extends Controller
 
     public function topComment($id, $order)
     {
-        $sort = [['order' => 'good_count', 'sort' => 'desc'], ['order'=>'c1.comment_date','sort'=>'desc']];
+        $sort = [['order' => 'good_count', 'sort' => 'desc'], ['order' => 'c1.comment_date', 'sort' => 'desc']];
         return $this->jsonResponse(Comment::select(
             'c1.comment_id',
             'c1.name',
@@ -34,15 +35,15 @@ class CommentController extends Controller
             ->from('comments as c1')
             ->where('c1.slander_id', $id)
             ->where('c1.connection', 0)
-            ->orderBy($sort[$order]['order'],$sort[$order]['sort'] )
+            ->orderBy($sort[$order]['order'], $sort[$order]['sort'])
             ->limit(20)
             ->get());
     }
 
-    
+
     public function topComment_all($id, $order)
     {
-        $sort = [['order' => 'good_count', 'sort' => 'desc'], ['order'=>'c1.comment_date','sort'=>'desc']];
+        $sort = [['order' => 'good_count', 'sort' => 'desc'], ['order' => 'c1.comment_date', 'sort' => 'desc']];
         return $this->jsonResponse(Comment::select(
             'c1.comment_id',
             'c1.name',
@@ -56,7 +57,7 @@ class CommentController extends Controller
             ->from('comments as c1')
             ->where('c1.slander_id', $id)
             ->where('c1.connection', 0)
-            ->orderBy($sort[$order]['order'],$sort[$order]['sort'] )
+            ->orderBy($sort[$order]['order'], $sort[$order]['sort'])
             ->get());
     }
     public function underComment($id)
@@ -94,7 +95,7 @@ class CommentController extends Controller
             'connection' => $request->connection,
             'comment_date' => $request->comment_date,
         ]);
-        
+
         $sort = [['order' => 'good_count', 'sort' => 'desc'], ['order' => 'c1.comment_date', 'sort' => 'desc']];
 
         if ($request->select == 0)
@@ -142,8 +143,11 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Comment $comment)
+    public function destroy(Request $request)
     {
-        //
+        Comment::where('comment_id', $request->comment_id)
+            ->delete();
+        Comment::where('connection', $request->comment_id)
+            ->delete();
     }
 }

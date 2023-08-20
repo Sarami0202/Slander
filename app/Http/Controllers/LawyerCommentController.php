@@ -16,6 +16,7 @@ class LawyerCommentController extends Controller
     public function getComment($id)
     {
         return $this->jsonResponse(LawyerComment::select(
+            'lc1.lawyer_comment_id',
             'lc1.lawyer_comment',
             'lc1.lawyer_comment_date',
             'lc1.lawyer_id',
@@ -29,6 +30,19 @@ class LawyerCommentController extends Controller
             ->orderBy('lawyer_comment_date', 'asc')
             ->get());
     }
+    public function getLawyerComment($id)
+    {
+        return $this->jsonResponse(LawyerComment::select(
+            'lawyer_comment_id',
+            'lawyer_comment',
+            'lawyer_comment_date',
+            'lawyer_id',
+        )
+            ->where('lawyer_id', $id)
+            ->orderBy('lawyer_comment_date', 'desc')
+            ->get());
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -75,8 +89,10 @@ class LawyerCommentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(LawyerComment $lawyerComment)
+
+    public function destroy(Request $request)
     {
-        //
+        LawyerComment::where('lawyer_comment_id', $request->lawyer_comment_id)
+            ->delete();
     }
 }

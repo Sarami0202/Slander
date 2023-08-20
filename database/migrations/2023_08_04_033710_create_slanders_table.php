@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id('slander_id');
             $table->string('img');
             $table->integer('platform');
-            $table->string('title');
+            $table->text('title');
             $table->string('url');
             $table->string('victim');
             $table->string('perpetrator');
