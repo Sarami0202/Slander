@@ -56,7 +56,8 @@ class SlanderController extends Controller
     {
         return $this->jsonResponse(Preview::all());
     }
-    public function search($id)
+
+    public function adminSearch($id)
     {
         return $this->jsonResponse(Slander::select('*')
             ->orWhere('slander_id', $id)
@@ -66,6 +67,49 @@ class SlanderController extends Controller
             ->get());
     }
 
+    public function search(Request $request)
+    {
+
+        if ($request->type != "all") {
+            $query = Slander::from('slanders')
+                ->select('*')
+                ->Where($request->type, 'like', "%$request->key%")
+                ->whereIn('platform', explode(",", $request->platform))
+                ->where('view', 1);
+        } else {
+            $query = Slander::from('slanders')
+                ->where(function ($query) use ($request) {
+                    $query->orWhere('slander_id', $request->key)
+                        ->orWhere('title', 'like', "%$request->key%")
+                        ->orWhere('perpetrator', 'like', "%$request->key%")
+                        ->orWhere('victim', 'like', "%$request->key%");
+                })->where(function ($query) use ($request) {
+                $query->whereIn('platform', explode(",", $request->platform))
+                    ->where('view', 1);
+            });
+        }
+        if ($request->lawyer == 1) {
+            $query = $query->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('lawyer_comments')
+                    ->whereRaw('slanders.slander_id = lawyer_comments.slander_id');
+            });
+        } else if ($request->lawyer == 2) {
+            $query = $query->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('lawyer_comments')
+                    ->whereRaw('slanders.slander_id = lawyer_comments.slander_id');
+            });
+        }
+        $count = $query->count();
+        return [
+            'count' => $count,
+            'data' => $this->JsonResponse($query->orderBy('slander_date', 'desc')
+                ->offset($request->num * ($request->page - 1))
+                ->limit($request->num)
+                ->get())
+        ];
+    }
     public function getNewSlander($num)
     {
         return $this->JsonResponse(Slander::select(
@@ -257,7 +301,7 @@ class SlanderController extends Controller
                 ->get())
         ];
     }
-    public function getConnection($id)
+    public function getConnection($id, $num)
     {
         return $this->JsonResponse(Slander::inRandomOrder()->select(
             'slander_id',
@@ -272,9 +316,7 @@ class SlanderController extends Controller
             ->from('slanders as s1')
             ->where('connection', $id)
             ->where('view', 1)
-            ->groupBy('slander_id', 'img', 'platform', 'title', 'perpetrator', 'victim', 'preview_count', 'good_count')
-            ->orderBy('slander_date', 'asc')
-            ->limit(5)
+            ->limit($num)
             ->get());
     }
     public function getConnection_all($id)
@@ -293,12 +335,25 @@ class SlanderController extends Controller
             ->from('slanders as s1')
             ->where('connection', $id)
             ->where('view', 1)
-            ->groupBy('slander_id', 'img', 'platform', 'title', 'perpetrator', 'victim', 'preview_count', 'good_count')
-            ->orderBy('slander_date', 'asc')
             ->get());
     }
-
-
+    public function getOther($num)
+    {
+        return $this->JsonResponse(Slander::inRandomOrder()->select(
+            'slander_id',
+            'img',
+            'platform',
+            'title',
+            'perpetrator',
+            'victim',
+            DB::raw('(SELECT COUNT(*) FROM previews AS p1 WHERE s1.slander_id = p1.slander_id) as preview_count'),
+            DB::raw('(SELECT COUNT(*) FROM slander_evaluations AS se1 WHERE s1.slander_id = se1.slander_id AND se1.type = 0 ) as good_count'),
+        )
+            ->from('slanders as s1')
+            ->where('view', 1)
+            ->limit($num)
+            ->get());
+    }
     public function getConnectionTop($id)
     {
         return $this->JsonResponse(Slander::select(

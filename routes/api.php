@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/slander/{id?}', 'App\Http\Controllers\SlanderController@slander');
-Route::get('/slander_search/{id?}', 'App\Http\Controllers\SlanderController@search');
+Route::get('/slander_admin_search/{id?}', 'App\Http\Controllers\SlanderController@adminSearch');
+Route::post('/slander_search', 'App\Http\Controllers\SlanderController@search');
 Route::get('/slander_all', 'App\Http\Controllers\SlanderController@all');
 Route::get('/slander_new/{num?}', 'App\Http\Controllers\SlanderController@getNewSlander');
 Route::get('/slander_new_all/{num?}/{page?}', 'App\Http\Controllers\SlanderController@getNewAllSlander');
@@ -23,9 +24,10 @@ Route::get('/slander_month_all/{num?}/{page?}', 'App\Http\Controllers\SlanderCon
 Route::get('/slander_preview/{num?}', 'App\Http\Controllers\SlanderController@getPreviewSlander');
 Route::get('/slander_preview_all/{num?}/{page?}', 'App\Http\Controllers\SlanderController@getPreviewAllSlander');
 Route::get('/slander_preview_month/{num?}/{page?}', 'App\Http\Controllers\SlanderController@getPreviewMonthSlander');
-Route::get('/slander_connection/{id?}', 'App\Http\Controllers\SlanderController@getConnection');
+Route::get('/slander_connection/{id?}/{num?}', 'App\Http\Controllers\SlanderController@getConnection');
 Route::get('/slander_connection_top/{id?}', 'App\Http\Controllers\SlanderController@getConnectionTop');
-Route::get('/slander_connection_all/{id?}', 'App\Http\Controllers\SlanderController@getConnection_all');
+Route::get('/slander_connection_all/{id?}/{num?}', 'App\Http\Controllers\SlanderController@getConnection_all');
+Route::post('/slander_other/{num?}', 'App\Http\Controllers\SlanderController@getOther');
 Route::post('/slander_create', 'App\Http\Controllers\SlanderController@create');
 Route::post('/slander_delete', 'App\Http\Controllers\SlanderController@destroy');
 Route::post('/slander_view', 'App\Http\Controllers\SlanderController@viewUpdate');
