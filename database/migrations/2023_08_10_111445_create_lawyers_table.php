@@ -15,9 +15,11 @@ return new class extends Migration {
             $table->string('name');
             $table->string('mail');
             $table->string('pass');
-            $table->string('url');
+            $table->string('tell');
+            $table->integer('num');
+            $table->string('url')->nullable();
             $table->string('img');
-            $table->integer('license')->default(1);
+            $table->integer('license')->default(2);
         });
     }
 

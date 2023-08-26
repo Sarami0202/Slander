@@ -59,13 +59,17 @@ Route::post('/lawyer_update', 'App\Http\Controllers\LawyerController@update');
 Route::post('/lawyer_license', 'App\Http\Controllers\LawyerController@licenseUpdate');
 Route::post('/lawyer_delete', 'App\Http\Controllers\LawyerController@destroy');
 Route::post('/lawyer', 'App\Http\Controllers\LawyerController@getLawyer');
+Route::post('/lawyer_request', 'App\Http\Controllers\LawyerController@getRequestLawyer');
 Route::post('/lawyer_create', 'App\Http\Controllers\LawyerController@create');
 Route::post('/lawyer_comment_create', 'App\Http\Controllers\LawyerCommentController@create');
 Route::post('/lawyer_comment_delete', 'App\Http\Controllers\LawyerCommentController@destroy');
 Route::post('/auth', 'App\Http\Controllers\LawyerController@auth');
 
 
-Route::post('/inquiry_send', 'App\Http\Controllers\InquiryController@inquirySend');
+Route::post('/inquiry_send', 'App\Http\Controllers\MailController@inquirySend');
+Route::post('/PRinquiry_send', 'App\Http\Controllers\MailController@PRinquirySend');
+Route::post('/LawyerInquiry_send', 'App\Http\Controllers\MailController@LawyerInquirySend');
+Route::post('/reception_send', 'App\Http\Controllers\MailController@ReceptionSend');
 Route::get('/preview_all', 'App\Http\Controllers\SlanderController@preview_all');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

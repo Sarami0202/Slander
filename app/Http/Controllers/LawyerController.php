@@ -7,6 +7,9 @@ use App\Models\LawyerComment;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\LawyerMail;
+
 class LawyerController extends Controller
 {
     /**
@@ -14,7 +17,9 @@ class LawyerController extends Controller
      */
     public function all()
     {
-        return $this->jsonResponse(Lawyer::all());
+        return $this->jsonResponse(Lawyer::select('*')
+            ->where('license', "<=", 1)
+            ->get());
     }
 
 
@@ -22,6 +27,13 @@ class LawyerController extends Controller
     {
         return $this->jsonResponse(Lawyer::select('*')
             ->where('lawyer_id', $request->id)
+            ->where('license', 1)
+            ->get());
+    }
+    public function getRequestLawyer(Request $request)
+    {
+        return $this->jsonResponse(Lawyer::select('*')
+            ->where('license', 2)
             ->get());
     }
     public function auth(Request $request)
@@ -48,6 +60,8 @@ class LawyerController extends Controller
             'name' => $request->name,
             'mail' => $request->mail,
             'pass' => $request->pass,
+            'tel' => $request->tel,
+            'num' => $request->num,
             'url' => $request->url,
         ]);
     }
@@ -60,20 +74,38 @@ class LawyerController extends Controller
             $path = isset($main_file) ? $main_file->store('icon', 'public') : null;
             $lawyer = Lawyer::where('lawyer_id', $request->lawyer_id)->first();
             Storage::disk('public')->delete($lawyer->img);
-        }
-        Lawyer::where('lawyer_id', $request->lawyer_id)->update([
-            'img' => $path,
-            'name' => $request->name,
-            'mail' => $request->mail,
-            'pass' => $request->pass,
-            'url' => $request->url,
-        ]);
+            Lawyer::where('lawyer_id', $request->lawyer_id)->update([
+                'img' => $path,
+                'name' => $request->name,
+                'mail' => $request->mail,
+                'pass' => $request->pass,
+                'tel' => $request->tel,
+                'url' => $request->url,
+            ]);
+        } else
+            Lawyer::where('lawyer_id', $request->lawyer_id)->update([
+                'name' => $request->name,
+                'mail' => $request->mail,
+                'pass' => $request->pass,
+                'tel' => $request->tel,
+                'url' => $request->url,
+            ]);
     }
     /**
      * Display the specified resource.
      */
     public function licenseUpdate(Request $request)
     {
+        $license = Lawyer::select('license')->where('lawyer_id', $request->lawyer_id)->first();
+        if ($license->license == 2)
+            Mail::send(
+                new LawyerMail(
+                    1,
+                    $request->name,
+                    $request->mail,
+                    $request->num,
+                )
+            );
         Lawyer::where('lawyer_id', $request->lawyer_id)->update([
             'license' => $request->license
         ]);
@@ -87,6 +119,16 @@ class LawyerController extends Controller
      */
     public function destroy(Request $request)
     {
+        $license = Lawyer::select('license')->where('lawyer_id', $request->lawyer_id)->first();
+        if ($license->license == 2)
+            Mail::send(
+                new LawyerMail(
+                    0,
+                    $request->name,
+                    $request->mail,
+                    $request->num,
+                )
+            );
         Lawyer::where('lawyer_id', $request->lawyer_id)
             ->delete();
         LawyerComment::where('lawyer_id', $request->lawyer_id)
