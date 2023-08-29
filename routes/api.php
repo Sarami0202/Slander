@@ -55,6 +55,7 @@ Route::post('/report_create', 'App\Http\Controllers\ReportController@create');
 Route::post('/lawyer_all', 'App\Http\Controllers\LawyerController@all');
 Route::get('/lawyer_comment/{id?}', 'App\Http\Controllers\LawyerCommentController@getComment');
 Route::get('/lawyer_comment_all/{id?}', 'App\Http\Controllers\LawyerCommentController@getLawyerComment');
+Route::post('/lawyer_admin_search', 'App\Http\Controllers\LawyerController@adminSearch');
 Route::post('/lawyer_update', 'App\Http\Controllers\LawyerController@update');
 Route::post('/lawyer_license', 'App\Http\Controllers\LawyerController@licenseUpdate');
 Route::post('/lawyer_delete', 'App\Http\Controllers\LawyerController@destroy');

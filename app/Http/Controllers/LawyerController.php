@@ -30,6 +30,16 @@ class LawyerController extends Controller
             ->where('license', 1)
             ->get());
     }
+
+    public function adminSearch(Request $request)
+    {
+        return $this->jsonResponse(Lawyer::where('license', '<=', 1)->where(function ($query) use ($request) {
+            $query
+                ->orWhere('name', 'like', "%$request->key%")
+                ->orWhere('tel', $request->key)
+                ->orWhere('num', $request->key);
+        })->get());
+    }
     public function getRequestLawyer(Request $request)
     {
         return $this->jsonResponse(Lawyer::select('*')
@@ -80,6 +90,7 @@ class LawyerController extends Controller
                 'mail' => $request->mail,
                 'pass' => $request->pass,
                 'tel' => $request->tel,
+                'num' => $request->num,
                 'url' => $request->url,
             ]);
         } else
@@ -88,6 +99,7 @@ class LawyerController extends Controller
                 'mail' => $request->mail,
                 'pass' => $request->pass,
                 'tel' => $request->tel,
+                'num' => $request->num,
                 'url' => $request->url,
             ]);
     }
