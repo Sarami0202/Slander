@@ -112,13 +112,13 @@ class SlanderController extends Controller
             $query = $query->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('lawyer_comments')
-                    ->whereRaw('slander_id = lawyer_comments.slander_id');
+                    ->whereRaw('s1.slander_id = lawyer_comments.slander_id');
             });
         } else if ($request->lawyer == 2) {
             $query = $query->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('lawyer_comments')
-                    ->whereRaw('slander_id = lawyer_comments.slander_id');
+                    ->whereRaw('s1.slander_id = lawyer_comments.slander_id');
             });
         }
         $count = $query->count();
