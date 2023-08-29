@@ -12,10 +12,10 @@ return new class extends Migration {
     {
         Schema::create('slanders', function (Blueprint $table) {
             $table->id('slander_id');
-            $table->string('img');
+            $table->text('img');
             $table->integer('platform');
             $table->text('title');
-            $table->string('url');
+            $table->text('url');
             $table->string('victim');
             $table->string('perpetrator');
             $table->text('comment');

@@ -70,14 +70,34 @@ class SlanderController extends Controller
     public function search(Request $request)
     {
 
+
         if ($request->type != "all") {
-            $query = Slander::from('slanders')
-                ->select('*')
+            $query = Slander::select(
+                'slander_id',
+                'img',
+                'platform',
+                'title',
+                'perpetrator',
+                'victim',
+                DB::raw('(SELECT COUNT(*) FROM previews AS p1 WHERE s1.slander_id = p1.slander_id) as preview_count'),
+                DB::raw('(SELECT COUNT(*) FROM slander_evaluations AS se1 WHERE s1.slander_id = se1.slander_id AND se1.type = 0 ) as good_count'),
+            )
+                ->from('slanders as s1')
                 ->Where($request->type, 'like', "%$request->key%")
                 ->whereIn('platform', explode(",", $request->platform))
                 ->where('view', 1);
         } else {
-            $query = Slander::from('slanders')
+            $query = Slander::select(
+                'slander_id',
+                'img',
+                'platform',
+                'title',
+                'perpetrator',
+                'victim',
+                DB::raw('(SELECT COUNT(*) FROM previews AS p1 WHERE s1.slander_id = p1.slander_id) as preview_count'),
+                DB::raw('(SELECT COUNT(*) FROM slander_evaluations AS se1 WHERE s1.slander_id = se1.slander_id AND se1.type = 0 ) as good_count'),
+            )
+                ->from('slanders as s1')
                 ->where(function ($query) use ($request) {
                     $query->orWhere('slander_id', $request->key)
                         ->orWhere('title', 'like', "%$request->key%")
