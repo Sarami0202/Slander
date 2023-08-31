@@ -54,11 +54,11 @@ class TokenController extends Controller
             ->where('token_date', '>=', $date)
             ->orderBy('token_date', 'desc')
             ->first();
-        if (count($code) > 0)
+        if ($code != null)
             if ($request->token == $code->token)
                 return (true);
             else
-                return (false);
+                return ($code);
         else
             return (false);
     }
