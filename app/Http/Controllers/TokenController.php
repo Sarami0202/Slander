@@ -58,7 +58,7 @@ class TokenController extends Controller
             if ($request->token == $code->token)
                 return (true);
             else
-                return ($code);
+                return (false);
         else
             return (false);
     }
