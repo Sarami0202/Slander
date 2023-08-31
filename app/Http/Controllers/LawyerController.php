@@ -59,21 +59,26 @@ class LawyerController extends Controller
      */
     public function create(Request $request)
     {
-        $path = null;
-        if ($request['img'] != null) {
-            $main_file = $request->file('img');
-            $path = isset($main_file) ? $main_file->store('icon', 'public') : null;
-        }
+        $cnt = Lawyer::select('*')->where('mail', $request->mail)->get();
+        if (count($cnt) < 1) {
+            $path = null;
+            if ($request['img'] != null) {
+                $main_file = $request->file('img');
+                $path = isset($main_file) ? $main_file->store('icon', 'public') : null;
+            }
 
-        Lawyer::insert([
-            'img' => $path,
-            'name' => $request->name,
-            'mail' => $request->mail,
-            'pass' => $request->pass,
-            'tel' => $request->tel,
-            'num' => $request->num,
-            'url' => $request->url,
-        ]);
+            Lawyer::insert([
+                'img' => $path,
+                'name' => $request->name,
+                'mail' => $request->mail,
+                'pass' => $request->pass,
+                'tel' => $request->tel,
+                'num' => $request->num,
+                'url' => $request->url,
+            ]);
+            return (true);
+        } else
+            return (false);
     }
 
     public function update(Request $request)
@@ -106,6 +111,12 @@ class LawyerController extends Controller
     /**
      * Display the specified resource.
      */
+    public function changePass(Request $request)
+    {
+        Lawyer::where('mail', $request->mail)->update([
+            'pass' => $request->pass
+        ]);
+    }
     public function licenseUpdate(Request $request)
     {
         $license = Lawyer::select('license')->where('lawyer_id', $request->lawyer_id)->first();

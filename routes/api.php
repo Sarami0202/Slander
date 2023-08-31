@@ -62,10 +62,13 @@ Route::post('/lawyer_delete', 'App\Http\Controllers\LawyerController@destroy');
 Route::post('/lawyer', 'App\Http\Controllers\LawyerController@getLawyer');
 Route::post('/lawyer_request', 'App\Http\Controllers\LawyerController@getRequestLawyer');
 Route::post('/lawyer_create', 'App\Http\Controllers\LawyerController@create');
+Route::post('/lawyer_change_pass', 'App\Http\Controllers\LawyerController@changePass');
 Route::post('/lawyer_comment_create', 'App\Http\Controllers\LawyerCommentController@create');
 Route::post('/lawyer_comment_delete', 'App\Http\Controllers\LawyerCommentController@destroy');
 Route::post('/auth', 'App\Http\Controllers\LawyerController@auth');
 
+Route::post('/token_create', 'App\Http\Controllers\TokenController@create');
+Route::post('/token_auth', 'App\Http\Controllers\TokenController@auth');
 
 Route::post('/inquiry_send', 'App\Http\Controllers\MailController@inquirySend');
 Route::post('/PRinquiry_send', 'App\Http\Controllers\MailController@PRinquirySend');
