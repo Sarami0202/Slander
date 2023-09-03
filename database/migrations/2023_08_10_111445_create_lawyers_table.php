@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('pass');
             $table->string('tel');
             $table->integer('num');
-            $table->string('url')->nullable();
+            $table->text('url')->nullable();
             $table->string('img');
             $table->integer('license')->default(2);
         });
