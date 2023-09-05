@@ -83,7 +83,7 @@ class SlanderController extends Controller
                 DB::raw('(SELECT COUNT(*) FROM slander_evaluations AS se1 WHERE s1.slander_id = se1.slander_id AND se1.type = 0 ) as good_count'),
             )
                 ->from('slanders as s1')
-                ->Where($request->type, 'like', "%$request->key%")
+                ->Where($request->type, $request->key)
                 ->whereIn('platform', explode(",", $request->platform))
                 ->where('view', 1);
         } else {
@@ -390,6 +390,56 @@ class SlanderController extends Controller
             ->where('slander_id', $id)
             ->where('view', 1)
             ->get());
+    }
+    public function getVictimSlander($num)
+    {
+        $date = date('Y-m-d h:i:s', strtotime("-1 month"));
+        return $this->JsonResponse(Slander::select(
+            's1.victim',
+            DB::raw('(SELECT COUNT(*) FROM slanders AS s2 WHERE s2.victim = s1.victim AND s1.slander_date >= "' . $date . '") as victim_count'),
+            DB::raw('SUBSTRING_INDEX(GROUP_CONCAT(s1.img), ",", 6) as img_list')
+        )
+            ->from('slanders as s1')
+            ->where('s1.view', 1)
+            ->groupBy('s1.victim', 'victim_count')
+            ->orderBy('victim_count', 'desc')
+            ->limit($num)
+            ->get());
+    }
+
+    public function getVictimSlander_all($time, $num, $page)
+    {
+        if ($time != "all")
+            $date = date('Y-m-d h:i:s', strtotime("-1 $time"));
+        else
+            $date = date('Y-m-d h:i:s', strtotime("-10 year"));
+        $count = Slander::select(
+            's1.victim',
+            DB::raw('(SELECT COUNT(*) FROM slanders AS s2 WHERE s2.victim = s1.victim AND s1.slander_date >= "' . $date . '" AND s2.slander_date >= "' . $date . '") as victim_count'),
+        )
+            ->from('slanders as s1')
+            ->where('s1.slander_date', '>', $date)
+            ->where('s1.view', 1)
+            ->havingRaw('victim_count >= 1')
+            ->groupBy('s1.victim', 'victim_count')
+            ->get()
+            ->count();
+        return [
+            'count' => $count,
+            'data' => $this->JsonResponse(Slander::select(
+                's1.victim',
+                DB::raw('(SELECT COUNT(*) FROM slanders AS s2 WHERE s2.victim = s1.victim AND s1.slander_date >= "' . $date . '" AND s2.slander_date >= "' . $date . '") as victim_count'),
+                DB::raw('SUBSTRING_INDEX(GROUP_CONCAT(s1.img), ",", 6) as img_list')
+            )
+                ->from('slanders as s1')
+                ->where('s1.view', 1)
+                ->havingRaw('victim_count >= 1')
+                ->groupBy('s1.victim', 'victim_count')
+                ->orderBy('victim_count', 'desc')
+                ->offset($num * ($page - 1))
+                ->limit($num)
+                ->get())
+        ];
     }
     public function create(Request $request)
     {

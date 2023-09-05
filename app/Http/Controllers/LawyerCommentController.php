@@ -42,6 +42,31 @@ class LawyerCommentController extends Controller
             ->orderBy('lawyer_comment_date', 'desc')
             ->get());
     }
+    public function searchLawyerComment($id, $search)
+    {
+        if ($search == "all")
+            return $this->jsonResponse(LawyerComment::select(
+                'lawyer_comment_id',
+                'lawyer_comment',
+                'lawyer_comment_date',
+                'lawyer_id',
+            )
+                ->where('lawyer_id', $id)
+                ->orderBy('lawyer_comment_date', 'desc')
+                ->get());
+        else
+            return $this->jsonResponse(LawyerComment::select(
+                'lawyer_comment_id',
+                'lawyer_comment',
+                'lawyer_comment_date',
+                'lawyer_id',
+            )
+                ->orWhere('slander_id', $search)
+                ->orWhere('lawyer_comment', 'like', "%$search%")
+                ->where('lawyer_id', $id)
+                ->orderBy('lawyer_comment_date', 'desc')
+                ->get());
+    }
 
 
     /**
