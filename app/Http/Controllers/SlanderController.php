@@ -228,6 +228,7 @@ class SlanderController extends Controller
             )
                 ->from('slanders as s1')
                 ->where('s1.view', 1)
+                ->where('slander_date', '>', $date)
                 ->groupBy('s1.slander_id', 's1.img', 's1.platform', 's1.title', 's1.perpetrator', 's1.victim', 'good_count', 'month_good_count')
                 ->orderBy('month_good_count', 'desc')
                 ->offset($num * ($page - 1))
@@ -262,10 +263,13 @@ class SlanderController extends Controller
     {
         $date = date('Y-m-d h:i:s', strtotime("-1 day"));
         $count = Slander::select(
-            'slander_id'
+            'slander_id',
+            DB::raw('(SELECT COUNT(*) FROM previews AS p1 WHERE s1.slander_id = p1.slander_id AND p1.preview_date>="' . $date . '") as date_preview_count'),
         )
-            ->where('slander_date', '>', $date)
-            ->where('view', 1)
+            ->from('slanders as s1')
+            ->where('s1.view', 1)
+            ->havingRaw('date_preview_count >= 1')
+            ->get()
             ->count();
         return [
             'count' => $count,
@@ -282,6 +286,7 @@ class SlanderController extends Controller
             )
                 ->from('slanders as s1')
                 ->where('s1.view', 1)
+                ->havingRaw('date_preview_count >= 1')
                 ->groupBy('s1.slander_id', 's1.img', 's1.platform', 's1.title', 's1.perpetrator', 's1.victim', 'good_count', 'date_preview_count')
                 ->orderBy('date_preview_count', 'desc')
                 ->offset($num * ($page - 1))
@@ -294,10 +299,13 @@ class SlanderController extends Controller
     {
         $date = date('Y-m-d', strtotime("-1 month"));
         $count = Slander::select(
-            'slander_id'
+            'slander_id',
+            DB::raw('(SELECT COUNT(*) FROM previews AS p1 WHERE s1.slander_id = p1.slander_id AND p1.preview_date>="' . $date . '") as date_preview_count'),
         )
-            ->where('slander_date', '>', $date)
-            ->where('view', 1)
+            ->from('slanders as s1')
+            ->where('s1.view', 1)
+            ->havingRaw('date_preview_count >= 1')
+            ->get()
             ->count();
         return [
             'count' => $count,
@@ -314,6 +322,7 @@ class SlanderController extends Controller
             )
                 ->from('slanders as s1')
                 ->where('s1.view', 1)
+                ->havingRaw('date_preview_count >= 1')
                 ->groupBy('s1.slander_id', 's1.img', 's1.platform', 's1.title', 's1.perpetrator', 's1.victim', 'good_count', 'date_preview_count')
                 ->orderBy('date_preview_count', 'desc')
                 ->offset($num * ($page - 1))
